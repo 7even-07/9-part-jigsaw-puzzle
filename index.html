@@ -1,73 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jigsaw Puzzle Splitter</title>
-</head>
-<body>
-    <input type="file" id="upload" accept="image/*">
-    <canvas id="canvas" style="display:none;"></canvas>
-    <div id="puzzle-pieces"></div>
-
-    <script>
-        const upload = document.getElementById('upload');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const puzzlePiecesDiv = document.getElementById('puzzle-pieces');
-
-        upload.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                const img = new Image();
-                const url = URL.createObjectURL(file);
-                img.src = url;
-                
-                img.onload = function () {
-                    const imgWidth = img.width;
-                    const imgHeight = img.height;
-                    const pieceWidth = imgWidth / 3;
-                    const pieceHeight = imgHeight / 3;
-                    canvas.width = imgWidth;
-                    canvas.height = imgHeight;
-
-                    // Clear the div where puzzle pieces will be displayed
-                    puzzlePiecesDiv.innerHTML = '';
-
-                    // Split image into 9 pieces
-                    for (let i = 0; i < 3; i++) {
-                        for (let j = 0; j < 3; j++) {
-                            // Draw each part of the image to the canvas
-                            ctx.drawImage(img, j * pieceWidth, i * pieceHeight, pieceWidth, pieceHeight, 0, 0, pieceWidth, pieceHeight);
-                            
-                            // Create a new image element for each part
-                            const piece = new Image();
-                            piece.src = canvas.toDataURL();
-                            piece.style.border = "1px solid black";  // Add a border to distinguish the pieces
-                            puzzlePiecesDiv.appendChild(piece);
-
-                            // Save each piece as a separate image
-                            downloadImage(piece.src, `piece-${i}-${j}.png`);
-                        }
-                    }
-                };
-            }
-        });
-
-        function downloadImage(dataUrl, fileName) {
-            const a = document.createElement('a');
-            a.href = dataUrl;
-            a.download = fileName;
-            a.click();
-        }
-    </script>
-</body>
-</html> -->
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,12 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jigsaw Puzzle Splitter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <style>
+        .pieces-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+            grid-template-rows: repeat(3, 1fr);    /* 3 equal rows */
+            gap: 2px; /* Small gap between pieces */
+            width: 100%;
+            max-width: 600px; /* Optional: Set a max width for better control */
+            height: auto;
+            margin: auto;
+        }
+
+        .pieces-container img {
+            width: 100%;  /* Make each piece adapt to the size of its container */
+            height: 100%; /* Stretch to fit the container */
+            object-fit: cover; /* Cover the full space without distortion */
+            border: 1px solid black; /* Add border for clear visualization */
+        }
+
+        #download-btn {
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <input type="file" id="upload" accept="image/*">
     <canvas id="canvas" style="display:none;"></canvas>
-    <div id="puzzle-pieces"></div>
-    <button id="download-btn" style="display:none;">Download Puzzle Pieces</button>
+    <div class="pieces-container" id="puzzle-pieces"></div>
+    <button id="download-btn">Download Puzzle Pieces</button>
 
     <script>
         const upload = document.getElementById('upload');
@@ -96,14 +50,14 @@
                 const img = new Image();
                 const url = URL.createObjectURL(file);
                 img.src = url;
-                
+
                 img.onload = function () {
                     const imgWidth = img.width;
                     const imgHeight = img.height;
                     const pieceWidth = imgWidth / 3;
                     const pieceHeight = imgHeight / 3;
-                    canvas.width = imgWidth;
-                    canvas.height = imgHeight;
+                    canvas.width = pieceWidth;
+                    canvas.height = pieceHeight;
 
                     // Clear the div where puzzle pieces will be displayed
                     puzzlePiecesDiv.innerHTML = '';
@@ -113,8 +67,9 @@
                     for (let i = 0; i < 3; i++) {
                         for (let j = 0; j < 3; j++) {
                             // Draw each part of the image to the canvas
+                            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas before drawing
                             ctx.drawImage(img, j * pieceWidth, i * pieceHeight, pieceWidth, pieceHeight, 0, 0, pieceWidth, pieceHeight);
-                            
+
                             // Create a new image element for each part
                             const piece = new Image();
                             piece.src = canvas.toDataURL();
@@ -126,7 +81,7 @@
                         }
                     }
 
-                    // Show the download button
+                    // Show the download button after pieces are created
                     downloadBtn.style.display = 'block';
                 };
             }
